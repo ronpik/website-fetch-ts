@@ -1,0 +1,2 @@
+// Fetcher module placeholder
+export {};
