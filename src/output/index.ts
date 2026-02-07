@@ -1,5 +1,6 @@
 export { MirrorWriter } from './mirror.js';
 export { FlatWriter } from './flat.js';
+export { SingleFileWriter } from './single-file.js';
 export { IndexGenerator, extractTitle } from './index-generator.js';
 export type { IndexEntry } from './index-generator.js';
 export {
