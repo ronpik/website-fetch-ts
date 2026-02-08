@@ -279,3 +279,5 @@ export { AdaptiveRateLimiter, parseRetryAfter } from './rate-limiter.js';
 export type { RateLimiterConfig } from './rate-limiter.js';
 export { FetchQueue } from './queue.js';
 export type { FetchQueueConfig } from './queue.js';
+export { extractLinks } from './link-extractor.js';
+export type { ExtractedLink, ExtractLinksOptions } from './link-extractor.js';
