@@ -582,7 +582,8 @@ describe("createFetcher", () => {
     it("should throw FetchError for 500 response", async () => {
       const mockFetch = vi.fn()
         .mockResolvedValueOnce(mockRobotsAllowAll())
-        .mockResolvedValueOnce(
+        // Use mockResolvedValue (not Once) so all retry attempts get a 500 response
+        .mockResolvedValue(
           mockResponse({
             status: 500,
             ok: false,
@@ -591,7 +592,7 @@ describe("createFetcher", () => {
         );
       globalThis.fetch = mockFetch;
 
-      const fetcher = createFetcher(makeConfig());
+      const fetcher = createFetcher(makeConfig({ delay: 0 }));
 
       await expect(
         fetcher.fetch("https://example.com/error"),
@@ -736,7 +737,9 @@ describe("createFetcher", () => {
     });
 
     it("should clear robots.txt cache so getCrawlDelay returns undefined", async () => {
-      const robotsTxt = "User-agent: *\nCrawl-delay: 5\nDisallow:\n";
+      // Use a small crawl-delay to avoid exceeding test timeout
+      // (rate limiter sleeps for crawl-delay * 1000 ms before each request)
+      const robotsTxt = "User-agent: *\nCrawl-delay: 1\nDisallow:\n";
       const mockFetch = vi.fn()
         .mockResolvedValueOnce(
           mockResponse({
@@ -749,11 +752,11 @@ describe("createFetcher", () => {
         );
       globalThis.fetch = mockFetch;
 
-      const fetcher = createFetcher(makeConfig());
+      const fetcher = createFetcher(makeConfig({ delay: 0 }));
       await fetcher.fetch("https://example.com/page");
 
       // Before close, crawl delay should be available
-      expect(fetcher.getCrawlDelay("https://example.com/page")).toBe(5);
+      expect(fetcher.getCrawlDelay("https://example.com/page")).toBe(1);
 
       fetcher.close();
 
