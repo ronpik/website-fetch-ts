@@ -407,10 +407,15 @@ describe("createConverter", () => {
     expect(customFn).toHaveBeenCalledWith("<p>Input</p>", TEST_URL);
   });
 
-  it("should throw when 'custom' is selected without customConverter", () => {
-    expect(() =>
-      createConverter(makeConfig({ conversionStrategy: "custom" })),
-    ).toThrow("Custom conversion strategy requires a customConverter function");
+  it("should throw when 'custom' is selected without customConverter", async () => {
+    const converter = createConverter(
+      makeConfig({ conversionStrategy: "custom" }),
+    );
+    await expect(
+      converter.convert("<p>hello</p>", "https://example.com"),
+    ).rejects.toThrow(
+      "Custom conversion strategy requires a customConverter function",
+    );
   });
 });
 

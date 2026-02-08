@@ -2,6 +2,7 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import { join, relative, dirname } from 'node:path';
 
 import type { FetchedPage } from '../types.js';
+import type { LLMProvider } from '../llm/types.js';
 import { urlToPath, pathToMirrorFile, pathToFlatFile } from './utils.js';
 
 /**
@@ -275,4 +276,39 @@ export class IndexGenerator {
       lines.push(`- ${link}${desc}`);
     }
   }
+}
+
+/**
+ * Create an LLM-powered description provider for the IndexGenerator.
+ *
+ * Generates a one-sentence description for each fetched page by sending
+ * the first portion of its markdown content to the LLM for summarization.
+ * Uses the `index-generator` call site key.
+ *
+ * On LLM error, returns undefined (the IndexGenerator silently skips
+ * failed descriptions).
+ *
+ * @param llm - The LLM provider to use for generating descriptions
+ * @returns A description provider callback compatible with IndexGenerator.generate()
+ */
+export function createLLMDescriptionProvider(
+  llm: LLMProvider,
+): (page: FetchedPage) => Promise<string> {
+  return async (page: FetchedPage): Promise<string> => {
+    // Send a manageable snippet of the markdown for summarization
+    const snippet = page.markdown.substring(0, 2000);
+
+    const prompt = `Write a single concise sentence describing the content of this web page from ${page.url}.
+
+Page content (truncated):
+${snippet}
+
+Respond with only the one-sentence description, nothing else.`;
+
+    const description = await llm.invoke(prompt, {
+      callSite: 'index-generator',
+    });
+
+    return description.trim();
+  };
 }
