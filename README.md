@@ -112,6 +112,7 @@ Scope:
   --max-pages <n>                  Max pages to fetch (default: 100)
   --include <pattern>              URL patterns to include (repeatable)
   --exclude <pattern>              URL patterns to exclude (repeatable)
+  --prefix <path>                  Only follow links under this URL path prefix
 
 Output:
   -o, --output <dir>               Output directory (default: ./output)
@@ -259,6 +260,7 @@ All fields below are optional except `url`. When using smart or agent mode, `des
 | `maxPages` | `number` | `100` | Maximum number of pages to fetch |
 | `includePatterns` | `string[]` | — | Glob patterns for URL paths to include |
 | `excludePatterns` | `string[]` | — | Glob patterns for URL paths to exclude |
+| `pathPrefix` | `string` | — | Only follow links whose pathname starts with this prefix |
 
 Glob patterns match against the URL pathname. Supported syntax: `*` (any chars except `/`), `**` (any chars including `/`), `?` (single char).
 
@@ -362,6 +364,28 @@ await websiteFetch({
   outputDir: './api-docs',
 });
 ```
+
+### Restrict crawl to a URL path prefix
+
+Use `--prefix` to limit the crawl to pages under a specific path. This is simpler than include patterns when you just want to scope to a subtree of the site:
+
+```bash
+website-fetch https://docs.example.com \
+  --prefix /api/v2 \
+  --max-pages 50 \
+  -o ./api-v2-docs
+```
+
+```typescript
+await websiteFetch({
+  url: 'https://docs.example.com',
+  pathPrefix: '/api/v2',
+  maxPages: 50,
+  outputDir: './api-v2-docs',
+});
+```
+
+Note: the root URL is always fetched regardless of the prefix. The prefix only constrains which *discovered links* are followed. A prefix of `/api/v2` matches `/api/v2`, `/api/v2/`, and `/api/v2/users`, but not `/api/v2other`.
 
 ### Aggregate product research into a single file
 

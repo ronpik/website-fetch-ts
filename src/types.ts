@@ -44,6 +44,7 @@ export interface WebsiteFetchConfig {
   maxPages: number;
   includePatterns?: string[];
   excludePatterns?: string[];
+  pathPrefix?: string;
 
   // Output
   outputDir: string;

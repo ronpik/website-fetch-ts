@@ -41,6 +41,7 @@ function createProgram(): Command {
     .option('--max-pages <n>', 'Max pages to fetch', String(CONFIG_DEFAULTS.maxPages))
     .option('--include <pattern>', 'URL patterns to include (repeatable)', collect, [])
     .option('--exclude <pattern>', 'URL patterns to exclude (repeatable)', collect, [])
+    .option('--prefix <path>', 'Only follow links under this URL path prefix')
 
     // Output
     .option('-o, --output <dir>', 'Output directory', CONFIG_DEFAULTS.outputDir)
@@ -163,6 +164,7 @@ export async function run(argv: string[]): Promise<void> {
           description: config.description,
           includePatterns: config.includePatterns,
           excludePatterns: config.excludePatterns,
+          pathPrefix: config.pathPrefix,
         });
         process.exit(0);
       }

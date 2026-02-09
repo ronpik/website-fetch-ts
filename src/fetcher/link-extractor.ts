@@ -22,6 +22,8 @@ export interface ExtractLinksOptions {
   includePatterns?: string[];
   /** Glob-style patterns; URLs matching any of these are excluded. */
   excludePatterns?: string[];
+  /** Only include URLs whose pathname starts with this prefix. */
+  pathPrefix?: string;
 }
 
 /** Maximum length for the context string. */
@@ -128,6 +130,10 @@ export function extractLinks(
   const sameDomainOnly = options?.sameDomainOnly ?? true;
   const includePatterns = options?.includePatterns;
   const excludePatterns = options?.excludePatterns;
+  let pathPrefix = options?.pathPrefix;
+  if (pathPrefix && !pathPrefix.startsWith('/')) {
+    pathPrefix = '/' + pathPrefix;
+  }
 
   let pageUrlParsed: URL;
   try {
@@ -187,6 +193,24 @@ export function extractLinks(
     // Same-domain filtering
     if (sameDomainOnly && resolved.hostname !== pageUrlParsed.hostname) {
       continue;
+    }
+
+    // Path prefix filtering
+    if (pathPrefix) {
+      const pathname = resolved.pathname;
+      if (!pathname.startsWith(pathPrefix)) {
+        continue;
+      }
+      // Ensure the prefix matches at a path boundary:
+      // either the pathname equals the prefix exactly, the prefix ends with '/',
+      // or the character after the prefix is '/'.
+      if (
+        pathname.length > pathPrefix.length &&
+        !pathPrefix.endsWith('/') &&
+        pathname[pathPrefix.length] !== '/'
+      ) {
+        continue;
+      }
     }
 
     // Include pattern filtering

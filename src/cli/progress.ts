@@ -111,6 +111,7 @@ export function printDryRun(
     description?: string;
     includePatterns?: string[];
     excludePatterns?: string[];
+    pathPrefix?: string;
   },
 ): void {
   process.stderr.write('\n--- Dry Run ---\n');
@@ -128,6 +129,9 @@ export function printDryRun(
   }
   if (config.excludePatterns && config.excludePatterns.length > 0) {
     process.stderr.write(`Exclude patterns: ${config.excludePatterns.join(', ')}\n`);
+  }
+  if (config.pathPrefix) {
+    process.stderr.write(`Path prefix: ${config.pathPrefix}\n`);
   }
   process.stderr.write('--- No pages will be fetched ---\n');
 }

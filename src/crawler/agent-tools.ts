@@ -68,6 +68,7 @@ export function buildAgentTools(ctx: AgentToolContext) {
     sameDomainOnly: true,
     includePatterns: ctx.config.includePatterns,
     excludePatterns: ctx.config.excludePatterns,
+    pathPrefix: ctx.config.pathPrefix,
   };
 
   return {

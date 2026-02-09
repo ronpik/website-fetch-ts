@@ -94,6 +94,7 @@ export class SimpleCrawler {
             sameDomainOnly: true,
             includePatterns: this.config.includePatterns,
             excludePatterns: this.config.excludePatterns,
+            pathPrefix: this.config.pathPrefix,
           });
 
           for (const link of links) {

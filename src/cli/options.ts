@@ -12,6 +12,7 @@ export interface CLIOptions {
   maxPages?: string;
   include?: string[];
   exclude?: string[];
+  prefix?: string;
   output: string;
   flat?: boolean;
   singleFile?: boolean;
@@ -126,6 +127,9 @@ export function buildConfig(
   }
   if (options.exclude !== undefined && options.exclude.length > 0) {
     config.excludePatterns = options.exclude;
+  }
+  if (options.prefix !== undefined) {
+    config.pathPrefix = options.prefix;
   }
 
   // Output

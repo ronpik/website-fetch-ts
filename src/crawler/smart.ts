@@ -269,6 +269,7 @@ export class SmartCrawler {
             sameDomainOnly: true,
             includePatterns: this.config.includePatterns,
             excludePatterns: this.config.excludePatterns,
+            pathPrefix: this.config.pathPrefix,
           });
 
           // Classify links via LLM before enqueueing

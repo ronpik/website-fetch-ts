@@ -488,6 +488,22 @@ describe("CLI (src/cli/)", () => {
       expect(config.llmConfig!.defaults.provider).toBe("openai");
     });
 
+    it("should map --prefix to config.pathPrefix", () => {
+      const config = buildConfig(
+        "https://example.com",
+        makeDefaultCLIOptions({ prefix: "/docs/api" }),
+      );
+      expect(config.pathPrefix).toBe("/docs/api");
+    });
+
+    it("should not set pathPrefix when --prefix is not provided", () => {
+      const config = buildConfig(
+        "https://example.com",
+        makeDefaultCLIOptions(),
+      );
+      expect(config.pathPrefix).toBeUndefined();
+    });
+
     it("should only set properties that are explicitly provided", () => {
       // With minimal options, many config fields should be undefined
       const config = buildConfig(
@@ -841,6 +857,22 @@ describe("CLI (src/cli/)", () => {
       expect(output).toContain("/blog/**");
     });
 
+    it("should display path prefix when provided", () => {
+      printDryRun("https://example.com", {
+        mode: "simple",
+        maxDepth: 5,
+        maxPages: 100,
+        outputDir: "./output",
+        respectRobots: true,
+        pathPrefix: "/docs/api",
+      });
+
+      const output = stderrSpy.mock.calls
+        .map((c) => c[0])
+        .join("");
+      expect(output).toContain("Path prefix: /docs/api");
+    });
+
     it("should show 'No pages will be fetched' message", () => {
       printDryRun("https://example.com", {
         mode: "simple",
@@ -1126,6 +1158,20 @@ describe("CLI (src/cli/)", () => {
 
       expect(mockWebsiteFetch).toHaveBeenCalledWith(
         expect.objectContaining({ model: "gpt-4o" }),
+      );
+    });
+
+    it("should pass --prefix option as pathPrefix", async () => {
+      await run([
+        "node",
+        "website-fetch",
+        "https://example.com",
+        "--prefix",
+        "/docs/api",
+      ]);
+
+      expect(mockWebsiteFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ pathPrefix: "/docs/api" }),
       );
     });
 

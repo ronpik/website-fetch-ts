@@ -423,6 +423,110 @@ describe('extractLinks', () => {
     });
   });
 
+  describe('pathPrefix filtering', () => {
+    it('should include links under the prefix and exclude others', () => {
+      const page = html(`
+        <p><a href="/api/v2/users">Users</a></p>
+        <p><a href="/api/v2/posts">Posts</a></p>
+        <p><a href="/api/v1/legacy">Legacy</a></p>
+        <p><a href="/blog/post">Blog</a></p>
+      `);
+
+      const links = extractLinks(page, BASE_URL, {
+        pathPrefix: '/api/v2',
+      });
+
+      expect(links).toHaveLength(2);
+      expect(links.map((l) => l.url)).toEqual([
+        'https://example.com/api/v2/users',
+        'https://example.com/api/v2/posts',
+      ]);
+    });
+
+    it('should match exact path when prefix has no trailing slash', () => {
+      const page = html(`
+        <p><a href="/api/v2">Exact</a></p>
+        <p><a href="/api/v2/">Trailing slash</a></p>
+        <p><a href="/api/v2/foo">Sub path</a></p>
+        <p><a href="/api/v2other">Different path</a></p>
+      `);
+
+      const links = extractLinks(page, BASE_URL, {
+        pathPrefix: '/api/v2',
+      });
+
+      expect(links).toHaveLength(3);
+      expect(links.map((l) => l.url)).toEqual([
+        'https://example.com/api/v2',
+        'https://example.com/api/v2/',
+        'https://example.com/api/v2/foo',
+      ]);
+    });
+
+    it('should not match exact path when prefix has trailing slash', () => {
+      const page = html(`
+        <p><a href="/api/v2">Exact</a></p>
+        <p><a href="/api/v2/">Trailing slash</a></p>
+        <p><a href="/api/v2/foo">Sub path</a></p>
+      `);
+
+      const links = extractLinks(page, BASE_URL, {
+        pathPrefix: '/api/v2/',
+      });
+
+      expect(links).toHaveLength(2);
+      expect(links.map((l) => l.url)).toEqual([
+        'https://example.com/api/v2/',
+        'https://example.com/api/v2/foo',
+      ]);
+    });
+
+    it('should auto-normalize prefix without leading slash', () => {
+      const page = html(`
+        <p><a href="/docs/guide">Guide</a></p>
+        <p><a href="/blog/post">Blog</a></p>
+      `);
+
+      const links = extractLinks(page, BASE_URL, {
+        pathPrefix: 'docs',
+      });
+
+      expect(links).toHaveLength(1);
+      expect(links[0].url).toBe('https://example.com/docs/guide');
+    });
+
+    it('should not filter when pathPrefix is undefined', () => {
+      const page = html(`
+        <p><a href="/a">A</a></p>
+        <p><a href="/b">B</a></p>
+      `);
+
+      const links = extractLinks(page, BASE_URL, {
+        pathPrefix: undefined,
+      });
+
+      expect(links).toHaveLength(2);
+    });
+
+    it('should work combined with include and exclude patterns', () => {
+      const page = html(`
+        <p><a href="/docs/api/auth">Auth API</a></p>
+        <p><a href="/docs/api/internal">Internal API</a></p>
+        <p><a href="/docs/guide">Guide</a></p>
+        <p><a href="/blog/post">Blog</a></p>
+      `);
+
+      const links = extractLinks(page, BASE_URL, {
+        pathPrefix: '/docs',
+        includePatterns: ['/docs/api/*'],
+        excludePatterns: ['/docs/api/internal'],
+      });
+
+      expect(links).toHaveLength(1);
+      expect(links[0].url).toBe('https://example.com/docs/api/auth');
+    });
+  });
+
   describe('combined options', () => {
     it('should apply both include and exclude patterns together', () => {
       const page = html(`
