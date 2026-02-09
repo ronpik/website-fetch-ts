@@ -3,18 +3,40 @@
   "version": "0.1.0",
   "description": "Fetch and convert website content to structured formats",
   "type": "module",
+  "main": "./dist/sdk/index.js",
+  "types": "./dist/sdk/index.d.ts",
+  "files": ["dist"],
   "bin": {
     "website-fetch": "./dist/bin/website-fetch.js"
   },
   "exports": {
-    ".": "./dist/sdk/index.js",
-    "./fetcher": "./dist/fetcher/index.js",
-    "./converter": "./dist/converter/index.js",
-    "./llm": "./dist/llm/index.js",
-    "./crawler": "./dist/crawler/index.js",
-    "./output": "./dist/output/index.js"
+    ".": {
+      "types": "./dist/sdk/index.d.ts",
+      "default": "./dist/sdk/index.js"
+    },
+    "./fetcher": {
+      "types": "./dist/fetcher/index.d.ts",
+      "default": "./dist/fetcher/index.js"
+    },
+    "./converter": {
+      "types": "./dist/converter/index.d.ts",
+      "default": "./dist/converter/index.js"
+    },
+    "./llm": {
+      "types": "./dist/llm/index.d.ts",
+      "default": "./dist/llm/index.js"
+    },
+    "./crawler": {
+      "types": "./dist/crawler/index.d.ts",
+      "default": "./dist/crawler/index.js"
+    },
+    "./output": {
+      "types": "./dist/output/index.d.ts",
+      "default": "./dist/output/index.js"
+    }
   },
   "scripts": {
+    "prepare": "tsc",
     "build": "tsc",
     "test": "vitest run",
     "lint": "eslint src/",

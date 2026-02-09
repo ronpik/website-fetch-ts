@@ -157,25 +157,25 @@ describe("package.json", () => {
   });
 
   describe("exports map", () => {
-    const expectedExports: Record<string, string> = {
-      ".": "./dist/sdk/index.js",
-      "./fetcher": "./dist/fetcher/index.js",
-      "./converter": "./dist/converter/index.js",
-      "./llm": "./dist/llm/index.js",
-      "./crawler": "./dist/crawler/index.js",
-      "./output": "./dist/output/index.js",
+    const expectedExports: Record<string, { types: string; default: string }> = {
+      ".": { types: "./dist/sdk/index.d.ts", default: "./dist/sdk/index.js" },
+      "./fetcher": { types: "./dist/fetcher/index.d.ts", default: "./dist/fetcher/index.js" },
+      "./converter": { types: "./dist/converter/index.d.ts", default: "./dist/converter/index.js" },
+      "./llm": { types: "./dist/llm/index.d.ts", default: "./dist/llm/index.js" },
+      "./crawler": { types: "./dist/crawler/index.d.ts", default: "./dist/crawler/index.js" },
+      "./output": { types: "./dist/output/index.d.ts", default: "./dist/output/index.js" },
     };
 
     it("should have all required export entries", () => {
-      const exports = pkg.exports as Record<string, string>;
+      const exports = pkg.exports as Record<string, { types: string; default: string }>;
       expect(exports).toBeDefined();
       for (const [key, value] of Object.entries(expectedExports)) {
-        expect(exports[key], `exports["${key}"] should be "${value}"`).toBe(value);
+        expect(exports[key], `exports["${key}"] should match`).toEqual(value);
       }
     });
 
     it("should have exactly 6 export entries", () => {
-      const exports = pkg.exports as Record<string, string>;
+      const exports = pkg.exports as Record<string, unknown>;
       expect(Object.keys(exports)).toHaveLength(6);
     });
   });
@@ -341,12 +341,12 @@ describe("build output (dist)", () => {
 
   describe("exports map files match build output", () => {
     const pkg = readJson("package.json") as Record<string, unknown>;
-    const exports = pkg.exports as Record<string, string>;
+    const exports = pkg.exports as Record<string, { types: string; default: string }>;
 
-    for (const [exportKey, exportPath] of Object.entries(exports)) {
-      it(`exports["${exportKey}"] -> ${exportPath} should exist`, () => {
-        const fullPath = join(PROJECT_ROOT, exportPath);
-        expect(existsSync(fullPath), `${exportPath} should exist for export "${exportKey}"`).toBe(
+    for (const [exportKey, exportEntry] of Object.entries(exports)) {
+      it(`exports["${exportKey}"] -> ${exportEntry.default} should exist`, () => {
+        const fullPath = join(PROJECT_ROOT, exportEntry.default);
+        expect(existsSync(fullPath), `${exportEntry.default} should exist for export "${exportKey}"`).toBe(
           true,
         );
       });
