@@ -495,6 +495,25 @@ describe('extractLinks', () => {
       expect(links[0].url).toBe('https://example.com/docs/guide');
     });
 
+    it('should extract pathname when pathPrefix is a full URL', () => {
+      const page = html(`
+        <p><a href="/docs/en/agent-sdk/quickstart">Quickstart</a></p>
+        <p><a href="/docs/en/agent-sdk/typescript">TypeScript</a></p>
+        <p><a href="/docs/en/intro">Intro</a></p>
+        <p><a href="/blog/post">Blog</a></p>
+      `);
+
+      const links = extractLinks(page, BASE_URL, {
+        pathPrefix: 'https://example.com/docs/en/agent-sdk',
+      });
+
+      expect(links).toHaveLength(2);
+      expect(links.map((l) => l.url)).toEqual([
+        'https://example.com/docs/en/agent-sdk/quickstart',
+        'https://example.com/docs/en/agent-sdk/typescript',
+      ]);
+    });
+
     it('should not filter when pathPrefix is undefined', () => {
       const page = html(`
         <p><a href="/a">A</a></p>

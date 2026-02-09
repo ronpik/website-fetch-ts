@@ -41,7 +41,7 @@ function createProgram(): Command {
     .option('--max-pages <n>', 'Max pages to fetch', String(CONFIG_DEFAULTS.maxPages))
     .option('--include <pattern>', 'URL patterns to include (repeatable)', collect, [])
     .option('--exclude <pattern>', 'URL patterns to exclude (repeatable)', collect, [])
-    .option('--prefix <path>', 'Only follow links under this URL path prefix')
+    .option('--prefix <path>', 'Only follow links under this URL path prefix (path or full URL)')
 
     // Output
     .option('-o, --output <dir>', 'Output directory', CONFIG_DEFAULTS.outputDir)

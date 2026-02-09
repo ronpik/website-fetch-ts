@@ -131,8 +131,19 @@ export function extractLinks(
   const includePatterns = options?.includePatterns;
   const excludePatterns = options?.excludePatterns;
   let pathPrefix = options?.pathPrefix;
-  if (pathPrefix && !pathPrefix.startsWith('/')) {
-    pathPrefix = '/' + pathPrefix;
+  if (pathPrefix) {
+    // If the prefix is a full URL, extract just the pathname
+    try {
+      const parsed = new URL(pathPrefix);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        pathPrefix = parsed.pathname;
+      }
+    } catch {
+      // Not a valid URL — treat as a path
+    }
+    if (!pathPrefix.startsWith('/')) {
+      pathPrefix = '/' + pathPrefix;
+    }
   }
 
   let pageUrlParsed: URL;
